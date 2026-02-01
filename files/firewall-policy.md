@@ -39,23 +39,6 @@ NAT: ✅ ATTIVO
 IP Pool: Use Outgoing Interface Address
 Log Allowed Traffic: All Sessions
 
-#### WAN → DNS-RDBMS Server (BLOCCO)
-
-#### WAN → Amministrazione (BLOCCO)
-
-Name: WAN-to-Admin
-Incoming Interface: wan1
-Outgoing Interface: vlan10
-Source: + all
-Destination: + WebServer-VIP
-Schedule: always
-Service: + HTTP, + HTTPS
-Action: ✅ ACCEPT
-
-NAT: ✅ ATTIVO
-IP Pool: Use Outgoing Interface Address
-Log Allowed Traffic: All Sessions
-
 ### Amministrazione
 
 #### Amministrazione → DNS-RDBMS Server (SSH)

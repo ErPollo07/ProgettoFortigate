@@ -5,22 +5,9 @@ Sono state create delle policy che permettono il traffico necessario tra le vari
 Quello che non è permesso viene bloccato dalla regola implicita di default "deny all".
 Sono state create delle regole specifiche per bloccare l'accesso dalla VLAN degli Uffici (VLAN30) e dalla WAN, verso le VLAN più sensibili (Amministrazione e DNS-RDBMS Server) e verso il firewall stesso.
 
-## Configurazione di una policy via GUI
-
-Passaggi per la configurazione di una policy via GUI:
-
-1. Policy & Objects -> Firewall Policy → Create New
-2. Name: "VLAN30-to-Internet"
-3. Incoming Interface: vlan30
-4. Outgoing Interface: wan1
-5. Source: VLAN30-subnet (10.10.30.0/24)
-6. Destination: all
-7. Service: ALL (o seleziona HTTP, HTTPS, DNS, NTP se vuoi limitare)
-8. Action: ACCEPT
-9. NAT: Enable
-10. Log Allowed Traffic: All Sessions
-
 ## Regole
+
+Per la confiugurazione delle regole si deve andare in `Policy & Objects` → `Firewall policy`.
 
 ### WAN
 
@@ -52,7 +39,7 @@ Schedule: always
 Service: + SSH
 Action: ✅ ACCEPT
 
-NAT: ❌ DISATTIVO
+NAT: ❌ DISATTIVATO
 Log Allowed Traffic: All Sessions
 
 #### Amministrazione → Web Server
@@ -66,7 +53,7 @@ Schedule: always
 Service: + SSH, + HTTP, + HTTPS
 Action: ✅ ACCEPT
 
-NAT: ❌ DISATTIVO
+NAT: ❌ DISATTIVATO
 Log Allowed Traffic: All Sessions
 
 #### Amministrazione → Firewall GUI
@@ -80,7 +67,7 @@ Schedule: always
 Service: + HTTPS, + SSH
 Action: ✅ ACCEPT
 
-NAT: ❌ DISATTIVO
+NAT: ❌ DISATTIVATO
 Log Allowed Traffic: All Sessions
 Nota: Se "Destination" non accetta l'IP del firewall, puoi usare "all" o creare un oggetto address con l'IP di management del FortiGate.
 
@@ -116,6 +103,21 @@ NAT: ✅ ATTIVO
 IP Pool: Use Outgoing Interface Address
 Log Allowed Traffic: All Sessions
 
+#### DNS-RDMS Server → WEB Server
+
+Name: DNS-RDBMS-to-WebServer
+Incoming Interface: vlan20
+Outgoing Interface: vlan40
+Source: + VLAN20-subnet
+Destination: + all
+Schedule: always
+Service: + ALL
+Action: ✅ ACCEPT
+
+NAT: ❌ DISATTIVATO
+IP Pool: Use Outgoing Interface Address
+Log Allowed Traffic: All Sessions
+
 ### Uffici
 
 #### Uffici → Web Server
@@ -129,7 +131,7 @@ Schedule: always
 Service: + HTTP, + HTTPS
 Action: ✅ ACCEPT
 
-NAT: ❌ DISATTIVO
+NAT: ❌ DISATTIVATO
 Log Allowed Traffic: All Sessions
 
 #### Uffici → Internet
@@ -158,7 +160,7 @@ Schedule: always
 Service: + ALL
 Action: ❌ DENY
 
-NAT: ❌ DISATTIVO
+NAT: ❌ DISATTIVATO
 Log Allowed Traffic: All Sessions
 
 #### Uffici → DNS-RDBMS Server (BLOCCO)
@@ -172,7 +174,7 @@ Schedule: always
 Service: + ALL
 Action: ❌ DENY
 
-NAT: ❌ DISATTIVO
+NAT: ❌ DISATTIVATO
 Log Allowed Traffic: All Sessions
 
 #### Uffici → Firewall (BLOCCO)
@@ -186,7 +188,7 @@ Schedule: always
 Service: + ALL
 Action: ❌ DENY
 
-NAT: ❌ DISATTIVO
+NAT: ❌ DISATTIVATO
 Log Allowed Traffic: All Sessions
 Nota: Questa regola potrebbe non essere necessaria se il FortiGate ha già regole di management implicite.
 
@@ -203,7 +205,7 @@ Schedule: always
 Service: + SSH, + MYSQL
 Action: ✅ ACCEPT
 
-NAT: ❌ DISATTIVO
+NAT: ❌ DISATTIVATO
 Log Allowed Traffic: All Sessions
 
 #### Web Server → Internet
@@ -234,7 +236,7 @@ Schedule: always
 Service: + HTTPS, + SSH
 Action: ✅ ACCEPT
 
-NAT: ❌ DISATTIVO
+NAT: ❌ DISATTIVATO
 Log Allowed Traffic: All Sessions
 Nota: Configura prima la VPN SSL, poi crea questa regola. L'oggetto "SSL-VPN_TUNNEL_ADDR1" viene creato automaticamente dal FortiGate quando configuri la VPN.
 
@@ -249,7 +251,7 @@ Schedule: always
 Service: + SSH
 Action: ✅ ACCEPT
 
-NAT: ❌ DISATTIVO
+NAT: ❌ DISATTIVATO
 Log Allowed Traffic: All Sessions
 
 #### VPN → Web Server
@@ -263,7 +265,7 @@ Schedule: always
 Service: + SSH
 Action: ✅ ACCEPT
 
-NAT: ❌ DISATTIVO
+NAT: ❌ DISATTIVATO
 Log Allowed Traffic: All Sessions
 
 #### VPN → Internet (OPZIONALE)

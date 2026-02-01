@@ -1,7 +1,7 @@
 # TODO
 
-- [ ] Creare le vlan
-- [ ] Aggiungere ai comandi dello switch "encapsulation dot1q <vlan_id>"
-- [ ] Applicare i comandi allo switch
-- [ ] Testare collegamento tra vlan
-- [ ] Applicare regole firewall
+- [ ] Verificare che le vlan siano create correttamente
+- [ ] Configurare il Virtual IP
+- [ ] Configurare il DNS
+- [ ] Inserire alcune Firewall policy per testare il funzionamento del firewall
+- [ ] Inserire tutte le firewall policy

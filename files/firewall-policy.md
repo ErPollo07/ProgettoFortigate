@@ -33,8 +33,8 @@ Log Allowed Traffic: All Sessions
 Name: Admin-SSH-to-DBServer
 Incoming Interface: vlan10
 Outgoing Interface: vlan20
-Source: + VLAN10-subnet
-Destination: + DNS-RDBMS-Server
+Source: + VLAN10-subnet (ip range della vlan10)
+Destination: + DNS-RDBMS-Server (singolo ip del server)
 Schedule: always
 Service: + SSH
 Action: ✅ ACCEPT
@@ -47,8 +47,8 @@ Log Allowed Traffic: All Sessions
 Name: Admin-to-WebServer
 Incoming Interface: vlan10
 Outgoing Interface: vlan40
-Source: + VLAN10-subnet
-Destination: + WebServer
+Source: + VLAN10-subnet (ip range della vlan10)
+Destination: + WebServer (singolo ip del server)
 Schedule: always
 Service: + SSH, + HTTP, + HTTPS
 Action: ✅ ACCEPT
@@ -61,7 +61,7 @@ Log Allowed Traffic: All Sessions
 Name: Admin-to-Firewall
 Incoming Interface: vlan10
 Outgoing Interface: any (o lascia vuoto se chiede)
-Source: + VLAN10-subnet
+Source: + VLAN10-subnet (ip range della vlan10)
 Destination: + Firewall-Management (IP del firewall)
 Schedule: always
 Service: + HTTPS, + SSH
@@ -76,7 +76,7 @@ Nota: Se "Destination" non accetta l'IP del firewall, puoi usare "all" o creare 
 Name: Admin-to-Internet
 Incoming Interface: vlan10
 Outgoing Interface: wan1 (o port1)
-Source: + VLAN10-subnet
+Source: + VLAN10-subnet (ip range della vlan10)
 Destination: + all
 Schedule: always
 Service: + ALL
@@ -93,7 +93,7 @@ Log Allowed Traffic: All Sessions
 Name: DBServer-to-Internet
 Incoming Interface: vlan20
 Outgoing Interface: wan1 (o port1)
-Source: + VLAN20-subnet
+Source: + VLAN20-subnet (ip range della vlan20)
 Destination: + all
 Schedule: always
 Service: + ALL
@@ -108,7 +108,7 @@ Log Allowed Traffic: All Sessions
 Name: DNS-RDBMS-to-WebServer
 Incoming Interface: vlan20
 Outgoing Interface: vlan40
-Source: + VLAN20-subnet
+Source: + VLAN20-subnet (ip range della vlan20)
 Destination: + all
 Schedule: always
 Service: + ALL
@@ -125,8 +125,8 @@ Log Allowed Traffic: All Sessions
 Name: Uffici-to-WebServer
 Incoming Interface: vlan30
 Outgoing Interface: vlan40
-Source: + VLAN30-subnet
-Destination: + WebServer
+Source: + VLAN30-subnet (ip range della vlan30)
+Destination: + WebServer (singolo ip del server)
 Schedule: always
 Service: + HTTP, + HTTPS
 Action: ✅ ACCEPT
@@ -139,7 +139,7 @@ Log Allowed Traffic: All Sessions
 Name: Uffici-to-Internet
 Incoming Interface: vlan30
 Outgoing Interface: wan1 (o port1)
-Source: + VLAN30-subnet
+Source: + VLAN30-subnet (ip range della vlan30)
 Destination: + all
 Schedule: always
 Service: + ALL
@@ -154,7 +154,7 @@ Log Allowed Traffic: All Sessions
 Name: Block-Uffici-to-Admin
 Incoming Interface: vlan30
 Outgoing Interface: vlan10
-Source: + VLAN30-subnet
+Source: + VLAN30-subnet (ip range della vlan30)
 Destination: + all
 Schedule: always
 Service: + ALL
@@ -168,7 +168,7 @@ Log Allowed Traffic: All Sessions
 Name: Block-Uffici-to-DBServer
 Incoming Interface: vlan30
 Outgoing Interface: vlan20
-Source: + VLAN30-subnet
+Source: + VLAN30-subnet (ip range della vlan30)
 Destination: + all
 Schedule: always
 Service: + ALL
@@ -182,7 +182,7 @@ Log Allowed Traffic: All Sessions
 Name: Block-Uffici-to-Firewall
 Incoming Interface: vlan30
 Outgoing Interface: any (o root)
-Source: + VLAN30-subnet
+Source: + VLAN30-subnet (ip range della vlan30)
 Destination: + Firewall-Management
 Schedule: always
 Service: + ALL
@@ -199,8 +199,8 @@ Nota: Questa regola potrebbe non essere necessaria se il FortiGate ha già regol
 Name: WebServer-to-DBServer
 Incoming Interface: vlan40
 Outgoing Interface: vlan20
-Source: + WebServer
-Destination: + DNS-RDBMS-Server
+Source: + WebServer (singolo ip del server)
+Destination: + DNS-RDBMS-Server (singolo ip del server)
 Schedule: always
 Service: + SSH, + MYSQL
 Action: ✅ ACCEPT
@@ -213,7 +213,7 @@ Log Allowed Traffic: All Sessions
 Name: WebServer-to-Internet
 Incoming Interface: vlan40
 Outgoing Interface: wan1 (o port1)
-Source: + VLAN40-subnet
+Source: + VLAN40-subnet (ip range della vlan40)
 Destination: + all
 Schedule: always
 Service: + ALL
@@ -232,7 +232,6 @@ Incoming Interface: ssl.root (o ssl-vpn interface)
 Outgoing Interface: any (o root)
 Source: + SSL-VPN_TUNNEL_ADDR1 (pool VPN)
 Destination: + Firewall-Management
-Schedule: always
 Service: + HTTPS, + SSH
 Action: ✅ ACCEPT
 
@@ -282,3 +281,19 @@ Action: ✅ ACCEPT
 NAT: ✅ ATTIVO
 IP Pool: Use Outgoing Interface Address
 Log Allowed Traffic: All Sessions
+
+## Source
+
+Per creare la source di una subnet:
+
+1. Cliccare su `Create New` → `Address`
+2. Inserire il nome
+3. Selezionare `Subnet` come Type
+4. Inserire l'indirizzo IP e la subnet mask
+
+Per creare la source di un singolo IP (es. server):
+
+1. Cliccare su `Create New` → `Address`
+2. Inserire il nome
+3. Selezionare `Subnet` come Type
+4. Inserire l'indirizzo IP del singolo host con subnet mask: `255.255.255.255`

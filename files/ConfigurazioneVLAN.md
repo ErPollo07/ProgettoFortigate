@@ -30,7 +30,7 @@ Ecco la configurazione per ogni vlan:
   - Alias: `dns-rdbsm-server`
   - Interface: `port2`
   - VLAN ID: `20`
-  - IP/Netmask: `192.168.10.254/255.255.255.0`
+  - IP/Netmask: `192.168.20.254/255.255.255.0`
   - Administrative Access: nessuno
   - DHCP Server: `Enabled`
     - IP range: `192.168.20.50-192.168.20.200`
@@ -39,7 +39,7 @@ Ecco la configurazione per ogni vlan:
   - Alias: `uffici`
   - Interface: `port2`
   - VLAN ID: `30`
-  - IP/Netmask: `192.168.10.254/255.255.255.0`
+  - IP/Netmask: `192.168.30.254/255.255.255.0`
   - Administrative Access: nessuno
   - DHCP Server: `Enabled`
     - IP range: `192.168.30.50-192.168.30.200`

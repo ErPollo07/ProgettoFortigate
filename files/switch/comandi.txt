@@ -1,0 +1,90 @@
+enable
+configure terminal
+
+hostname SW
+
+end
+exit
+
+! ================================
+!    	 Creazione vlan
+! ================================
+
+enable
+configure terminal
+
+vlan 10
+name mng
+exit
+vlan 20
+name dns-rdbms-server
+exit
+vlan 30
+name uffici
+exit
+vlan 40
+name web-server
+exit
+
+end
+exit
+
+! ================================
+!      Configurazione vlan
+! ================================ 
+
+enable
+configure terminal
+
+interface vlan 10
+ip address 192.168.10.253 255.255.255.0
+no shutdown
+exit
+
+interface vlan 20
+ip address 192.168.20.253 255.255.255.0
+no shutdown
+exit
+
+interface vlan 30
+ip address 192.168.30.253 255.255.255.0
+no shutdown
+exit
+
+interface vlan 40
+ip address 192.168.40.253 255.255.255.0
+no shutdown
+exit
+
+end
+exit
+
+! ================================
+!    Configurazione interfacce
+! ================================
+
+enable
+configure terminal
+
+interface fa0/1
+switchport mode trunk
+switchport trunk allowed vlan 10,20,30
+exit
+
+interface range fa0/5-9
+switchport access vlan 20
+no shutdown
+exit
+
+interface range fa0/10-14
+switchport access vlan 10
+no shutdown
+exit
+
+interface range fa0/15-19
+switchport access vlan 30
+no shutdown
+exit
+
+end
+exit

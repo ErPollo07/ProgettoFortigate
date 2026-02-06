@@ -5,7 +5,7 @@ Sono state create delle policy che permettono il traffico necessario tra le vari
 Quello che non è permesso viene bloccato dalla regola implicita di default "deny all".
 Sono state create delle regole specifiche per bloccare l'accesso dalla VLAN degli Uffici (VLAN30) e dalla WAN, verso le VLAN più sensibili (Amministrazione e DNS-RDBMS Server) e verso il firewall stesso.
 
-## Regole nuove
+## Regole
 
 ### WAN
 

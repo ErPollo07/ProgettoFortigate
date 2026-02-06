@@ -41,7 +41,7 @@ Questi computer devono poter accedere via https alla GUI del firewall.
 
 ### VLAN 20
 
-Contiene il server DNS e RDBMS che sono nello stesso raspberry pi.
+Contiene il server DNS e RDBMS che sono nello stesso raspberry pi con ip: `192.169.20.1`.
 Questo server deve essere accessibile in ssh solo dalla VLAN 10 (Amministrazione) e dalla VLAN 40 (Web-Server).
 
 #### Contenuto del rdbms-server
@@ -57,7 +57,7 @@ Non possono accedere in ssh a nessun server. Tanto meno alla GUI del firewall.
 
 ### VLAN 40
 
-Contiene il web server.
+Contiene il web server con ip: `192.169.40.1`.
 
 #### Contenuto del web server
 

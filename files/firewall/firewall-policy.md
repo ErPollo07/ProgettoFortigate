@@ -5,6 +5,24 @@ Sono state create delle policy che permettono il traffico necessario tra le vari
 Quello che non è permesso viene bloccato dalla regola implicita di default "deny all".
 Sono state create delle regole specifiche per bloccare l'accesso dalla VLAN degli Uffici (VLAN30) e dalla WAN, verso le VLAN più sensibili (Amministrazione e DNS-RDBMS Server) e verso il firewall stesso.
 
+```txt
+
+config firewall policy
+    edit 2
+        set name "BLOCK-WAN-to-AllVLANs"
+        set srcintf "port1"
+        set dstintf "port1" "port2"
+        set srcaddr "all"
+        set dstaddr "all"
+        set action deny
+        set schedule "always"
+        set service "ALL"
+        set logtraffic all
+        set comments "Blocco totale da WAN verso VLAN interne"
+    next
+end
+```
+
 ## Regole
 
 ### WAN

@@ -206,53 +206,9 @@ config firewall policy
     next
 end
 
-# Policy: BLOCCO VLAN 30 a VLAN 10
-config firewall policy
-    edit 30
-        set name "BLOCK-Uffici-to-Admin"
-        set srcintf "vlan30"
-        set dstintf "vlan10"
-        set srcaddr "VLAN30-subnet"
-        set dstaddr "all"
-        set action deny
-        set schedule "always"
-        set service "ALL"
-        set logtraffic all
-        set comments "Blocco Uffici verso Amministrazione"
-    next
-end
-
-# Policy: BLOCCO VLAN 30 a VLAN 20
-config firewall policy
-    edit 31
-        set name "BLOCK-Uffici-to-DBServer"
-        set srcintf "vlan30"
-        set dstintf "vlan20"
-        set srcaddr "VLAN30-subnet"
-        set dstaddr "all"
-        set action deny
-        set schedule "always"
-        set service "ALL"
-        set logtraffic all
-        set comments "Blocco Uffici verso DB Server"
-    next
-end
-
-# Policy: BLOCCO VLAN 30 a VLAN 40 (solo PING bloccato)
-config firewall policy
-    edit 32
-        set name "BLOCK-Uffici-Ping-to-VLAN40"
-        set srcintf "vlan30"
-        set dstintf "vlan40"
-        set srcaddr "VLAN30-subnet"
-        set dstaddr "all"
-        set action deny
-        set schedule "always"
-        set service "PING"
-        set logtraffic all
-        set comments "Blocco PING da Uffici a VLAN 40"
-    next
-end
+# =======
+# VLAN 30
+# =======
 
 # Policy: VLAN 30 a Web Server (HTTP, HTTPS)
 config firewall policy
@@ -302,6 +258,10 @@ config firewall policy
         set comments "Uffici accesso Internet completo"
     next
 end
+
+# =======
+# VLAN 40
+# =======
 
 # Policy: VLAN 40 a DNS-RDBMS Server (SSH, MYSQL, DNS)
 config firewall policy

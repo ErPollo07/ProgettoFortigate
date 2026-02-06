@@ -5,284 +5,53 @@ Sono state create delle policy che permettono il traffico necessario tra le vari
 Quello che non è permesso viene bloccato dalla regola implicita di default "deny all".
 Sono state create delle regole specifiche per bloccare l'accesso dalla VLAN degli Uffici (VLAN30) e dalla WAN, verso le VLAN più sensibili (Amministrazione e DNS-RDBMS Server) e verso il firewall stesso.
 
-## Regole
-
-Per la confiugurazione delle regole si deve andare in `Policy & Objects` → `Firewall policy`.
+## Regole nuove
 
 ### WAN
 
-#### WAN → Web Server
+-> Web Server: HTTPS, HTTP
+-> Vlan 10: BLOCCO TUTTO IL TRAFFICO
+-> Vlan 20: BLOCCO TUTTO IL TRAFFICO
+-> Vlan 30: BLOCCO TUTTO IL TRAFFICO
+-> Vlan 40: BLOCCO TUTTO IL TRAFFICO
 
-Name: WAN-to-WebServer
-Incoming Interface: wan1
-Outgoing Interface: vlan40
-Source: + all
-Destination: + WebServer-VIP
-Schedule: always
-Service: + HTTP, + HTTPS
-Action: ✅ ACCEPT
+### Vlan 10
 
-NAT: ✅ ATTIVO
-IP Pool: Use Outgoing Interface Address
-Log Allowed Traffic: All Sessions
+-> DNS-RDBMS Server: SSH, DNS
+-> Web Server: SSH, HTTP, HTTPS
+-> Vlan 20: Ping
+-> Vlan 30: Ping
+-> Vlan 40: Ping
+-> Internet: ALL
 
-### Amministrazione
+### Vlan 20
 
-#### Amministrazione → DNS-RDBMS Server (SSH)
+-> DNS-RDBMS Server: DNS
+-> Web Server: HTTP, HTTPS
+-> Vlan 10: Ping
+-> Vlan 30: Ping
+-> Vlan 40: Ping
+-> Internet: ALL
 
-Name: Admin-SSH-to-DBServer
-Incoming Interface: vlan10
-Outgoing Interface: vlan20
-Source: + VLAN10-subnet (ip range della vlan10)
-Destination: + DNS-RDBMS-Server (singolo ip del server)
-Schedule: always
-Service: + SSH
-Action: ✅ ACCEPT
+### Vlan 30
 
-NAT: ❌ DISATTIVATO
-Log Allowed Traffic: All Sessions
+-> DNS-RDBMS Server: DNS
+-> Web Server: HTTP, HTTPS
+-> Vlan 10: BLOCCO TUTTO IL TRAFFICO
+-> Vlan 20: Ping (BLOCCO)
+-> Vlan 40: Ping (BLOCCO)
+-> Internet: ALL
 
-#### Amministrazione → Web Server
+### Vlan 40
 
-Name: Admin-to-WebServer
-Incoming Interface: vlan10
-Outgoing Interface: vlan40
-Source: + VLAN10-subnet (ip range della vlan10)
-Destination: + WebServer (singolo ip del server)
-Schedule: always
-Service: + SSH, + HTTP, + HTTPS
-Action: ✅ ACCEPT
+-> DNS-RDBMS Server: DNS, SSH, MYSQL
+-> Web Server: HTTP, HTTPS
+-> Vlan 10: Ping
+-> Vlan 20: Ping
+-> Vlan 30: Ping
+-> Internet: ALL
 
-NAT: ❌ DISATTIVATO
-Log Allowed Traffic: All Sessions
-
-#### Amministrazione → Firewall GUI
-
-Name: Admin-to-Firewall
-Incoming Interface: vlan10
-Outgoing Interface: any (o lascia vuoto se chiede)
-Source: + VLAN10-subnet (ip range della vlan10)
-Destination: + Firewall-Management (IP del firewall)
-Schedule: always
-Service: + HTTPS, + SSH
-Action: ✅ ACCEPT
-
-NAT: ❌ DISATTIVATO
-Log Allowed Traffic: All Sessions
-Nota: Se "Destination" non accetta l'IP del firewall, puoi usare "all" o creare un oggetto address con l'IP di management del FortiGate.
-
-#### Amministrazione → Internet
-
-Name: Admin-to-Internet
-Incoming Interface: vlan10
-Outgoing Interface: wan1 (o port1)
-Source: + VLAN10-subnet (ip range della vlan10)
-Destination: + all
-Schedule: always
-Service: + ALL
-Action: ✅ ACCEPT
-
-NAT: ✅ ATTIVO
-IP Pool: Use Outgoing Interface Address
-Log Allowed Traffic: All Sessions
-
-### DNS-RDBMS Server
-
-#### DNS-RDBMS Server → Internet
-
-Name: DBServer-to-Internet
-Incoming Interface: vlan20
-Outgoing Interface: wan1 (o port1)
-Source: + VLAN20-subnet (ip range della vlan20)
-Destination: + all
-Schedule: always
-Service: + ALL
-Action: ✅ ACCEPT
-
-NAT: ✅ ATTIVO
-IP Pool: Use Outgoing Interface Address
-Log Allowed Traffic: All Sessions
-
-#### DNS-RDMS Server → WEB Server
-
-Name: DNS-RDBMS-to-WebServer
-Incoming Interface: vlan20
-Outgoing Interface: vlan40
-Source: + VLAN20-subnet (ip range della vlan20)
-Destination: + all
-Schedule: always
-Service: + ALL
-Action: ✅ ACCEPT
-
-NAT: ❌ DISATTIVATO
-IP Pool: Use Outgoing Interface Address
-Log Allowed Traffic: All Sessions
-
-### Uffici
-
-#### Uffici → Web Server
-
-Name: Uffici-to-WebServer
-Incoming Interface: vlan30
-Outgoing Interface: vlan40
-Source: + VLAN30-subnet (ip range della vlan30)
-Destination: + WebServer (singolo ip del server)
-Schedule: always
-Service: + HTTP, + HTTPS
-Action: ✅ ACCEPT
-
-NAT: ❌ DISATTIVATO
-Log Allowed Traffic: All Sessions
-
-#### Uffici → Internet
-
-Name: Uffici-to-Internet
-Incoming Interface: vlan30
-Outgoing Interface: wan1 (o port1)
-Source: + VLAN30-subnet (ip range della vlan30)
-Destination: + all
-Schedule: always
-Service: + ALL
-Action: ✅ ACCEPT
-
-NAT: ✅ ATTIVO
-IP Pool: Use Outgoing Interface Address
-Log Allowed Traffic: All Sessions
-
-#### Uffici → Amministrazione (BLOCCO)
-
-Name: Block-Uffici-to-Admin
-Incoming Interface: vlan30
-Outgoing Interface: vlan10
-Source: + VLAN30-subnet (ip range della vlan30)
-Destination: + all
-Schedule: always
-Service: + ALL
-Action: ❌ DENY
-
-NAT: ❌ DISATTIVATO
-Log Allowed Traffic: All Sessions
-
-#### Uffici → DNS-RDBMS Server (BLOCCO)
-
-Name: Block-Uffici-to-DBServer
-Incoming Interface: vlan30
-Outgoing Interface: vlan20
-Source: + VLAN30-subnet (ip range della vlan30)
-Destination: + all
-Schedule: always
-Service: + ALL
-Action: ❌ DENY
-
-NAT: ❌ DISATTIVATO
-Log Allowed Traffic: All Sessions
-
-#### Uffici → Firewall (BLOCCO)
-
-Name: Block-Uffici-to-Firewall
-Incoming Interface: vlan30
-Outgoing Interface: any (o root)
-Source: + VLAN30-subnet (ip range della vlan30)
-Destination: + Firewall-Management
-Schedule: always
-Service: + ALL
-Action: ❌ DENY
-
-NAT: ❌ DISATTIVATO
-Log Allowed Traffic: All Sessions
-Nota: Questa regola potrebbe non essere necessaria se il FortiGate ha già regole di management implicite.
-
-### WEB Server
-
-#### Web Server → DNS-RDBMS Server
-
-Name: WebServer-to-DBServer
-Incoming Interface: vlan40
-Outgoing Interface: vlan20
-Source: + WebServer (singolo ip del server)
-Destination: + DNS-RDBMS-Server (singolo ip del server)
-Schedule: always
-Service: + SSH, + MYSQL
-Action: ✅ ACCEPT
-
-NAT: ❌ DISATTIVATO
-Log Allowed Traffic: All Sessions
-
-#### Web Server → Internet
-
-Name: WebServer-to-Internet
-Incoming Interface: vlan40
-Outgoing Interface: wan1 (o port1)
-Source: + VLAN40-subnet (ip range della vlan40)
-Destination: + all
-Schedule: always
-Service: + ALL
-Action: ✅ ACCEPT
-
-NAT: ✅ ATTIVO
-IP Pool: Use Outgoing Interface Address
-Log Allowed Traffic: All Sessions
-
-### VPN
-
-#### VPN → Firewall
-
-Name: VPN-to-Firewall
-Incoming Interface: ssl.root (o ssl-vpn interface)
-Outgoing Interface: any (o root)
-Source: + SSL-VPN_TUNNEL_ADDR1 (pool VPN)
-Destination: + Firewall-Management
-Service: + HTTPS, + SSH
-Action: ✅ ACCEPT
-
-NAT: ❌ DISATTIVATO
-Log Allowed Traffic: All Sessions
-Nota: Configura prima la VPN SSL, poi crea questa regola. L'oggetto "SSL-VPN_TUNNEL_ADDR1" viene creato automaticamente dal FortiGate quando configuri la VPN.
-
-#### VPN → DNS-RDBMS Server
-
-Name: VPN-to-DBServer
-Incoming Interface: ssl.root (o ssl-vpn interface)
-Outgoing Interface: vlan20
-Source: + SSL-VPN_TUNNEL_ADDR1
-Destination: + DNS-RDBMS-Server
-Schedule: always
-Service: + SSH
-Action: ✅ ACCEPT
-
-NAT: ❌ DISATTIVATO
-Log Allowed Traffic: All Sessions
-
-#### VPN → Web Server
-
-Name: VPN-to-WebServer
-Incoming Interface: ssl.root (o ssl-vpn interface)
-Outgoing Interface: vlan40
-Source: + SSL-VPN_TUNNEL_ADDR1
-Destination: + WebServer
-Schedule: always
-Service: + SSH
-Action: ✅ ACCEPT
-
-NAT: ❌ DISATTIVATO
-Log Allowed Traffic: All Sessions
-
-#### VPN → Internet (OPZIONALE)
-
-Name: VPN-to-Internet
-Incoming Interface: ssl.root (o ssl-vpn interface)
-Outgoing Interface: wan1 (o port1)
-Source: + SSL-VPN_TUNNEL_ADDR1
-Destination: + all
-Schedule: always
-Service: + ALL
-Action: ✅ ACCEPT
-
-NAT: ✅ ATTIVO
-IP Pool: Use Outgoing Interface Address
-Log Allowed Traffic: All Sessions
-
-## Source
+## Creazione di Source e Destination
 
 Per creare la source di una subnet:
 

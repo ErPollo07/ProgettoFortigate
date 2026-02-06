@@ -69,6 +69,10 @@ end
 -> Vlan 30: Ping
 -> Internet: ALL
 
+## Regole in ordine
+
+
+
 ## Creazione di Source e Destination
 
 Per creare la source di una subnet:

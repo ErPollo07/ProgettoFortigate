@@ -1,0 +1,366 @@
+# FortiGate Firewall Policy - Comandi CLI
+# Questi comandi devono essere eseguiti dalla CLI del FortiGate
+# Assicurarsi di aver già creato gli oggetti address necessari prima di eseguire queste policy
+
+# Cambiare i nomi di:
+# vlan10, vlan20, vlan30, vlan40 con i nomi reali delle interfacce VLAN configurate
+
+# ============================================================================
+# PREREQUISITI: Creazione degli oggetti Address
+# ============================================================================
+
+# Creazione di indirizzi per le subnet delle VLAN e per i server specifici
+config firewall address
+    edit "VLAN10-subnet"
+        set subnet 192.168.10.0 255.255.255.0
+    next
+    edit "VLAN20-subnet"
+        set subnet 192.168.20.0 255.255.255.0
+    next
+    edit "VLAN30-subnet"
+        set subnet 192.168.30.0 255.255.255.0
+    next
+    edit "VLAN40-subnet"
+        set subnet 192.168.40.0 255.255.255.0
+    next
+    
+    # Creazione indirizzi specifici per i server
+    edit "DNS-RDBMS-Server"
+        set subnet 192.168.20.1 255.255.255.255
+        set comment "Indirizzo IP del server DNS-RDBMS"
+    next
+    edit "WebServer"
+        set subnet 192.168.40.1 255.255.255.255
+        set comment "Indirizzo IP del Web Server"
+    next
+    edit "Firewall-Management"
+        set subnet 192.168.10.254 255.255.255.255
+        set comment "Indirizzo di management del firewall"
+    next
+end
+
+# Creazione di address group per raggruppare tutte le vlan
+config firewall address-group
+    edit "All-VLANs"
+        set member "VLAN10-subnet" "VLAN20-subnet" "VLAN30-subnet" "VLAN40-subnet"
+        set comment "Gruppo di tutte le VLAN interne"
+    next
+end
+
+# ============================================================================
+# FIREWALL POLICIES
+# ============================================================================
+
+# =======
+# VLAN 10
+# =======
+
+# Policy: WAN a Web Server (HTTP/HTTPS)
+config firewall policy
+    edit 1
+        set name "WAN_to_WebServer"
+        set srcintf "wan"
+        set dstintf "vlan40"
+        set srcaddr "all"
+        set dstaddr "WebServer-VIP"
+        set action accept
+        set schedule "always"
+        set service "HTTP" "HTTPS"
+        set nat enable
+        set logtraffic all
+        set comments "Permette accesso al web server da Internet"
+    next
+end
+
+# Policy: VLAN 10 a DNS-RDBMS Server (SSH, DNS)
+config firewall policy
+    edit 10
+        set name "Admin_to_DNS-RDBMS-Server"
+        set srcintf "vlan10"
+        set dstintf "vlan20"
+        set srcaddr "VLAN10-subnet"
+        set dstaddr "DNS-RDBMS-Server"
+        set action accept
+        set schedule "always"
+        set service "SSH" "DNS"
+        set logtraffic all
+        set comments "Admin accede a DB Server"
+    next
+end
+
+# Policy: VLAN 10 a Web Server (SSH, HTTP, HTTPS)
+config firewall policy
+    edit 11
+        set name "Admin-to-WebServer"
+        set srcintf "vlan10"
+        set dstintf "vlan40"
+        set srcaddr "VLAN10-subnet"
+        set dstaddr "WebServer"
+        set action accept
+        set schedule "always"
+        set service "SSH" "HTTP" "HTTPS"
+        set logtraffic all
+        set comments "Admin accede a Web Server"
+    next
+end
+
+# Policy: VLAN 10 Ping Inter-VLAN
+config firewall policy
+    edit 12
+        set name "Admin-Ping-InterVLAN"
+        set srcintf "vlan10"
+        set dstintf "vlan20" "vlan30" "vlan40"
+        set srcaddr "VLAN10-subnet"
+        set dstaddr "all"
+        set action accept
+        set schedule "always"
+        set service "PING"
+        set logtraffic disable
+        set comments "Admin ping verso altre VLAN"
+    next
+end
+
+# Policy: VLAN 10 a Internet
+config firewall policy
+    edit 13
+        set name "Admin-to-Internet"
+        set srcintf "vlan10"
+        set dstintf "wan"
+        set srcaddr "VLAN10-subnet"
+        set dstaddr "all"
+        set action accept
+        set schedule "always"
+        set service "ALL"
+        set nat enable
+        set logtraffic utm
+        set comments "Admin accesso Internet completo"
+    next
+end
+
+# =======
+# VLAN 20
+# =======
+
+# Policy: VLAN 20 a DNS-RDBMS Server (DNS locale)
+config firewall policy
+    edit 20
+        set name "VLAN20-to-DBServer-DNS"
+        set srcintf "vlan20"
+        set dstintf "vlan20"
+        set srcaddr "VLAN20-subnet"
+        set dstaddr "DNS-RDBMS-Server"
+        set action accept
+        set schedule "always"
+        set service "DNS"
+        set logtraffic disable
+        set comments "Query DNS interne VLAN 20"
+    next
+end
+
+# Policy: VLAN 20 a Web Server (HTTP, HTTPS)
+config firewall policy
+    edit 21
+        set name "VLAN20-to-WebServer"
+        set srcintf "vlan20"
+        set dstintf "vlan40"
+        set srcaddr "VLAN20-subnet"
+        set dstaddr "WebServer"
+        set action accept
+        set schedule "always"
+        set service "HTTP" "HTTPS"
+        set logtraffic all
+        set comments "VLAN 20 accede a Web Server"
+    next
+end
+
+# Policy: VLAN 20 Ping Inter-VLAN
+config firewall policy
+    edit 22
+        set name "VLAN20-Ping-InterVLAN"
+        set srcintf "vlan20"
+        set dstintf "vlan10" "vlan30" "vlan40"
+        set srcaddr "VLAN20-subnet"
+        set dstaddr "all"
+        set action accept
+        set schedule "always"
+        set service "PING"
+        set logtraffic disable
+        set comments "VLAN 20 ping verso altre VLAN"
+    next
+end
+
+# Policy: VLAN 20 a Internet
+config firewall policy
+    edit 23
+        set name "VLAN20-to-Internet"
+        set srcintf "vlan20"
+        set dstintf "wan"
+        set srcaddr "VLAN20-subnet"
+        set dstaddr "all"
+        set action accept
+        set schedule "always"
+        set service "ALL"
+        set nat enable
+        set logtraffic utm
+        set comments "VLAN 20 accesso Internet (aggiornamenti, DNS forwarding)"
+    next
+end
+
+# Policy: BLOCCO VLAN 30 a VLAN 10
+config firewall policy
+    edit 30
+        set name "BLOCK-Uffici-to-Admin"
+        set srcintf "vlan30"
+        set dstintf "vlan10"
+        set srcaddr "VLAN30-subnet"
+        set dstaddr "all"
+        set action deny
+        set schedule "always"
+        set service "ALL"
+        set logtraffic all
+        set comments "Blocco Uffici verso Amministrazione"
+    next
+end
+
+# Policy: BLOCCO VLAN 30 a VLAN 20
+config firewall policy
+    edit 31
+        set name "BLOCK-Uffici-to-DBServer"
+        set srcintf "vlan30"
+        set dstintf "vlan20"
+        set srcaddr "VLAN30-subnet"
+        set dstaddr "all"
+        set action deny
+        set schedule "always"
+        set service "ALL"
+        set logtraffic all
+        set comments "Blocco Uffici verso DB Server"
+    next
+end
+
+# Policy: BLOCCO VLAN 30 a VLAN 40 (solo PING bloccato)
+config firewall policy
+    edit 32
+        set name "BLOCK-Uffici-Ping-to-VLAN40"
+        set srcintf "vlan30"
+        set dstintf "vlan40"
+        set srcaddr "VLAN30-subnet"
+        set dstaddr "all"
+        set action deny
+        set schedule "always"
+        set service "PING"
+        set logtraffic all
+        set comments "Blocco PING da Uffici a VLAN 40"
+    next
+end
+
+# Policy: VLAN 30 a Web Server (HTTP, HTTPS)
+config firewall policy
+    edit 33
+        set name "Uffici-to-WebServer"
+        set srcintf "vlan30"
+        set dstintf "vlan40"
+        set srcaddr "VLAN30-subnet"
+        set dstaddr "WebServer"
+        set action accept
+        set schedule "always"
+        set service "HTTP" "HTTPS"
+        set logtraffic all
+        set comments "Uffici accedono al Web Server"
+    next
+end
+
+# Policy: VLAN 30 a DNS Server (solo DNS)
+config firewall policy
+    edit 34
+        set name "Uffici-to-DNSServer"
+        set srcintf "vlan30"
+        set dstintf "vlan20"
+        set srcaddr "VLAN30-subnet"
+        set dstaddr "DNS-RDBMS-Server"
+        set action accept
+        set schedule "always"
+        set service "DNS"
+        set logtraffic disable
+        set comments "Uffici query DNS"
+    next
+end
+
+# Policy: VLAN 30 a Internet
+config firewall policy
+    edit 35
+        set name "Uffici-to-Internet"
+        set srcintf "vlan30"
+        set dstintf "wan"
+        set srcaddr "VLAN30-subnet"
+        set dstaddr "all"
+        set action accept
+        set schedule "always"
+        set service "ALL"
+        set nat enable
+        set logtraffic utm
+        set comments "Uffici accesso Internet completo"
+    next
+end
+
+# Policy: VLAN 40 a DNS-RDBMS Server (SSH, MYSQL, DNS)
+config firewall policy
+    edit 40
+        set name "WebServer-to-DBServer"
+        set srcintf "vlan40"
+        set dstintf "vlan20"
+        set srcaddr "WebServer"
+        set dstaddr "DNS-RDBMS-Server"
+        set action accept
+        set schedule "always"
+        set service "SSH" "MYSQL" "DNS"
+        set logtraffic all
+        set comments "Web Server accede al DB (CRITICO per applicazione)"
+    next
+end
+
+# Policy: VLAN 40 Ping Inter-VLAN
+config firewall policy
+    edit 41
+        set name "WebServer-Ping-InterVLAN"
+        set srcintf "vlan40"
+        set dstintf "vlan10" "vlan20" "vlan30"
+        set srcaddr "VLAN40-subnet"
+        set dstaddr "all"
+        set action accept
+        set schedule "always"
+        set service "PING"
+        set logtraffic disable
+        set comments "Web Server ping verso altre VLAN"
+    next
+end
+
+# Policy: VLAN 40 a Internet
+config firewall policy
+    edit 42
+        set name "WebServer-to-Internet"
+        set srcintf "vlan40"
+        set dstintf "wan"
+        set srcaddr "VLAN40-subnet"
+        set dstaddr "all"
+        set action accept
+        set schedule "always"
+        set service "ALL"
+        set nat enable
+        set logtraffic utm
+        set comments "Web Server accesso Internet (aggiornamenti)"
+    next
+end
+
+
+# ============================================================================
+# NOTE IMPORTANTI
+# ============================================================================
+# 1. Prima di applicare queste policy, verificare che le VLAN siano configurate
+# 2. Assicurarsi che il VIP "WebServer-VIP" sia configurato correttamente
+# 3. Gli indirizzi IP dei server (DNS-RDBMS-Server e WebServer) devono essere 
+#    aggiornati con gli IP effettivi assegnati
+# 4. La VPN SSL deve essere configurata prima delle regole VPN
+# 5. L'ordine delle policy è importante: le regole di DENY devono essere 
+#    posizionate prima delle regole più permissive
+# 6. Verificare sempre le policy con "diagnose debug flow" dopo l'applicazione

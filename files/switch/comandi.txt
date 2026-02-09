@@ -72,12 +72,12 @@ switchport trunk allowed vlan 10,20,30
 exit
 
 interface range fa0/5-9
-switchport access vlan 20
+switchport access vlan 10
 no shutdown
 exit
 
 interface range fa0/10-14
-switchport access vlan 10
+switchport access vlan 20
 no shutdown
 exit
 
@@ -85,6 +85,33 @@ interface range fa0/15-19
 switchport access vlan 30
 no shutdown
 exit
+
+end
+exit
+
+! ================================
+!    Protezione dello switch
+! ================================
+enable
+configure terminal
+
+! Utente locale (password cifrata)
+username admin privilege 15 secret admin
+
+! Password enable (cifrata)
+enable secret admin
+
+! Protezione accesso console
+line console 0
+login local
+exec-timeout 5 0
+exit
+
+! Cifratura password di linea
+service password-encryption
+
+! Banner di avviso
+banner motd # ACCESSO CONSENTITO SOLO A PERSONALE AUTORIZZATO #
 
 end
 exit

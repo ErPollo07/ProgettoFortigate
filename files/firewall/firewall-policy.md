@@ -6,7 +6,6 @@ Quello che non è permesso viene bloccato dalla regola implicita di default "den
 Sono state create delle regole specifiche per bloccare l'accesso dalla VLAN degli Uffici (VLAN30) e dalla WAN, verso le VLAN più sensibili (Amministrazione e DNS-RDBMS Server) e verso il firewall stesso.
 
 ```txt
-
 config firewall policy
     edit 2
         set name "BLOCK-WAN-to-AllVLANs"
@@ -70,8 +69,6 @@ end
 -> Internet: ALL
 
 ## Regole in ordine
-
-
 
 ## Creazione di Source e Destination
 

@@ -51,11 +51,6 @@ ip address 192.168.30.253 255.255.255.0
 no shutdown
 exit
 
-interface vlan 40
-ip address 192.168.40.253 255.255.255.0
-no shutdown
-exit
-
 end
 exit
 
@@ -90,16 +85,16 @@ end
 exit
 
 ! ================================
-!    Protezione dello switch
+!   Protezione acesso console
 ! ================================
 enable
 configure terminal
 
 ! Utente locale (password cifrata)
-username admin privilege 15 secret admin
+username admin privilege 15 secret TMZngael!*
 
 ! Password enable (cifrata)
-enable secret admin
+enable secret TMZngael!*
 
 ! Protezione accesso console
 line console 0

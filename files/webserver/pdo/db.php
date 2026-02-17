@@ -1,6 +1,5 @@
 <?php
-
-$host = "192.168.1.197"; // IP del Raspberry con MariaDB
+$host = "192.168.20.1"; // IP del Raspberry con MariaDB
 $username = "webuser";
 $password = "admin";
 $db = "webuser_login_db"; // nome database

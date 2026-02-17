@@ -2,33 +2,33 @@
 require "db.php";
 session_start();
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    $user = $_POST["user"];
+    $user = trim($_POST["user"]);
     $password = $_POST["password"];
 
-    try {
-        $stmt = $conn->prepare("SELECT id, username, password FROM users WHERE username = :user OR email = :email");
-        $stmt->execute(['user' => $user, "email" => $user]);
-        $result = $stmt->fetch(); // false se non trovato
+    $stmt = $conn->prepare("SELECT id, username, password FROM users WHERE username = ? OR email = ?");
+    $stmt->bind_param("ss", $user, $user);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-        if ($result) {
-            // Con password hashate (register.php usa password_hash)
-            if ($password == $result["password"]) {
-                $_SESSION["user_id"] = $result["id"];
-                $_SESSION["username"] = $result["username"];
+    if ($result->num_rows === 1) {
 
-                header("Location: welcome.php");
-                exit();
-            } else {
-                $errore = "Password non corretta.";
-            }
+        $row = $result->fetch_assoc();
+
+//        if (password_verify($password, $row["password"])) {
+        if ($password == $row['password']) {
+            $_SESSION["user_id"] = $row["id"];
+            $_SESSION["username"] = $row["username"];
+
+            header("Location: index.php");
+            exit();
         } else {
-            $errore = "Utente non trovato.";
+            $errore = "Password non corretta.";
         }
-    } catch (PDOException $e) {
-        $errore = $e->getMessage();
-        // In debug: $errore = $e->getMessage();
+
+    } else {
+        $errore = "Utente non trovato.";
     }
 }
 ?>

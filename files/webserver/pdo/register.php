@@ -5,38 +5,45 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $username = trim($_POST["username"] ?? "");
     $email = trim($_POST["email"] ?? "");
-    $passwordHash = password_hash($_POST["password"] ?? "", PASSWORD_DEFAULT);
+    $password = trim($_POST["password"] ?? "");
+    $confirmPassword = trim($_POST["confirm_password"] ?? "");
 
-    try {
-        // Controllo se username o email esistono già
-        $check = $conn->prepare("SELECT COUNT(*) FROM users WHERE username = :username OR email = :email");
-        $check->execute([
+    if ($password !== $confirmPassword) {
+        $errore = "Le password non coincidono";
+    } else {
+        $passwordHash = password_hash($_POST["password"] ?? "", PASSWORD_DEFAULT);
+
+        try {
+            // Controllo se username o email esistono già
+            $check = $conn->prepare("SELECT COUNT(*) FROM users WHERE username = :username OR email = :email");
+            $check->execute([
                 'username' => $username,
                 'email' => $email
-        ]);
-        $exists = (int)$check->fetchColumn();
+            ]);
+            $exists = (int)$check->fetchColumn();
 
-        if ($exists > 0) {
-            $errore = "Username o Email già registrati!";
-        } else {
+            if ($exists > 0) {
+                $errore = "Username o Email già registrati!";
+            } else {
 
-            $stmt = $conn->prepare(
+                $stmt = $conn->prepare(
                     "INSERT INTO users (username, email, password)
                  VALUES (:username, :email, :password)"
-            );
+                );
 
-            $stmt->execute([
+                $stmt->execute([
                     'username' => $username,
                     'email' => $email,
                     'password' => $passwordHash
-            ]);
+                ]);
 
-            header("Location: login.php");
-            exit();
+                header("Location: login.php");
+                exit();
+            }
+        } catch (PDOException $e) {
+            $errore = "Errore durante la registrazione.";
+            // In debug: $errore = $e->getMessage();
         }
-    } catch (PDOException $e) {
-        $errore = "Errore durante la registrazione.";
-        // In debug: $errore = $e->getMessage();
     }
 }
 ?>
@@ -124,6 +131,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         <label>Password</label>
         <input type="password" name="password" required>
+
+        <label>Conferma password</label>
+        <input type="password" name="confirm_password" required>
 
         <button type="submit">Registrati</button>
     </form>

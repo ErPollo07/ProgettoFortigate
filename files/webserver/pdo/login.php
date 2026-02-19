@@ -1,5 +1,6 @@
 <?php
 require "db.php";
+
 session_start();
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -14,7 +15,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         if ($result) {
             // Con password hashate (register.php usa password_hash)
-            if ($password == $result["password"]) {
+            if (password_verify($password, $result["password"])) {
                 $_SESSION["user_id"] = $result["id"];
                 $_SESSION["username"] = $result["username"];
 
@@ -115,6 +116,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <input type="password" name="password" required>
 
         <button type="submit">Accedi</button>
+
+        <p><a href="register.php">Oppure registrati</a></p>
     </form>
 </div>
 
